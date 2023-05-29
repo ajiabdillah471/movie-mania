@@ -1,0 +1,89 @@
+import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import MovieCard from "./component/MovieCard";
+
+const AppTiga = () => {
+  const [movies, setMovies] = useState([]);
+  const [searchKey, setSearchKey] = useState("");
+
+  const API_URL = "https://api.themoviedb.org/3/";
+  //   const apiKey = "d23ede28a0705a62134b1efa38c65fbb";
+
+  const fetchMovie = async (searchKey) => {
+    const type = searchKey ? `search` : `discover`;
+    const {
+      data: { results },
+    } = await axios.get(`${API_URL}/${type}/movie?`, {
+      params: {
+        api_key: process.env.REACT_APP_APIKEY,
+        query: searchKey,
+      },
+    });
+    setMovies(results);
+  };
+
+  //   const fetchMovie = async () => {
+  //     // const type = searchKey
+  //     //   ? `/search/movie?query=${searchKey}`
+  //     //   : `/discover/movie/?api_key=${apiKey}`;
+  //     const data = await axios
+  //       //   .get(`${API_URL}${type}`)
+  //       .get(`${API_URL}/discover/movie/?api_key=${apiKey}`)
+  //       .then((response) => {
+  //         // setMovies(results);
+  //         setMovies(response.data.results);
+  //       })
+  //       .catch((err) => {
+  //         console.log("errorr");
+  //       });
+  //   };
+
+  useEffect(() => {
+    fetchMovie();
+  }, []);
+
+  //   console.log(movies.results);
+
+  const renderMovie = () => {
+    return movies.map((movie) => {
+      return <MovieCard key={movie.id} film={movie} />;
+    });
+  };
+
+  const searchMovie = (e) => {
+    e.preventDefault();
+    fetchMovie(searchKey);
+  };
+
+  return (
+    <div className="bg-[#090a0e]">
+      <header className="container flex justify-between mx-auto p-10">
+        <h1 className="text-white font-bold text-2xl capitalize">
+          movie mania
+        </h1>
+        <form action="" onSubmit={searchMovie} className="">
+          <input
+            type="text"
+            className="border-2 py-1 p-2 rounded-sm "
+            onChange={(e) => {
+              setSearchKey(e.target.value);
+            }}
+          />
+          <button
+            type={"submit"}
+            className="px-6 py-1 bg-white ml-2 rounded-sm shadow-md"
+          >
+            Search!
+          </button>
+        </form>
+        {/* {searchKey} ini untuk mengecek e.target.value */}
+      </header>
+      <div className="container flex flex-wrap justify-center p-10 mx-auto  bg-slate-900">
+        {renderMovie()}
+      </div>
+    </div>
+  );
+};
+
+export default AppTiga;
